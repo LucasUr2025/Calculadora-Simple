@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [display, setDisplay] = useState("");
+
+  const handleClick = (value) => {
+    setDisplay(display + value);
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="contenedor">
+        <div className="calculadora">
+          <input type="text" placeholder="0" value={display} readOnly />
+          <div className="teclado">
+            <div className="numeros">
+              <button className="uno" onClick={() => handleClick("1")}>1</button>
+              <button onClick={() => handleClick("2")}>2</button>
+              <button className="tres" onClick={() => handleClick("3")}>3</button>
+              <button onClick={() => handleClick("4")}>4</button>
+              <button onClick={() => handleClick("5")}>5</button>
+              <button onClick={() => handleClick("6")}>6</button>
+              <button className="siete" onClick={() => handleClick("7")}>7</button>
+              <button onClick={() => handleClick("8")}>8</button>
+              <button className="nueve" onClick={() => handleClick("9")}>9</button>
+              <br></br>
+              <button className="cero" onClick={() => handleClick("0")}>0</button>
+            </div>
+            <div className="signos">
+              <button className="C" onClick={() => setDisplay("")}>C</button>
+              <button className="borrar" onClick={() => setDisplay(display.slice(0, -1))}>⌫</button>
+              <button onClick={() => handleClick("+")}>+</button>
+              <button onClick={() => handleClick("-")}>-</button>
+              <button onClick={() => handleClick("*")}>×</button>
+              <button className="division" onClick={() => handleClick("/")}>÷</button>
+              <button className="igual" onClick={() => setDisplay(eval(display))}>=</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <footer>
+        <p>Calculadora de Lucas</p>
+      </footer>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

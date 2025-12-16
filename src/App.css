@@ -1,42 +1,131 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background-color: rgb(5, 5, 5);
+}
+
+.calculadora {
   text-align: center;
+  width: 500px;
+  padding: 20px;
+  background-color: #353535;
+  border-radius: 15px;
+  box-shadow:  0 0 20px 5px rgb(255, 136, 0);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+button, input {
+    font-size: 25px;
+    color: white;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+button {
+    background-color: #242424;
+    border: 1px solid rgb(255, 136, 0);
+}
+
+.uno {
+    border-top-left-radius: 10px;
+}
+
+.tres {
+    border-top-right-radius: 10px;
+}
+
+.siete {
+    border-bottom-left-radius: 10px;
+}
+
+.nueve {
+    border-bottom-right-radius: 10px;
+}
+
+.cero {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.C {
+    border-top-left-radius: 10px;
+    background-color: rgb(255, 136, 0);
+    border-right: 1px solid #FFA42E;
+}
+
+.borrar {
+    border-top-right-radius: 10px;
+    background-color: rgb(255, 136, 0);
+    border-left: 1px solid #FFA42E;
+}
+
+.division {
+    border-bottom-right-radius: 10px;
+}
+
+.igual {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+input {
+  height: 30px;
+  width: 98%;
+  margin-bottom: 20px;
+  background-color: #242424;
+  border: 2px solid rgb(255, 136, 0);
+  border-radius: 10px;
+}
+
+.teclado {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  height: 200px;
+}
+
+.numeros {
+  margin-right: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.signos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+footer {
+    color: #C4C4C4;
+    position: fixed;
+    left: 46%;
+    top: 530px    
+}
+
+@media (max-width: 600px) {
+  .calculadora {
+    height: 65vh;
+    width: 40vh;
   }
-  to {
-    transform: rotate(360deg);
+
+  body {
+    height: 80vh;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .teclado {
+    grid-template-columns: 3fr 1fr;
+    height: 45vh;
   }
-}
 
-.card {
-  padding: 2em;
-}
+  input {
+    height: 10vh;
+  }
 
-.read-the-docs {
-  color: #888;
+  .signos {
+    grid-template-columns: 1fr;
+  }
+
+  footer {
+    left: 30%;
+    top: 90%
+  }
 }
