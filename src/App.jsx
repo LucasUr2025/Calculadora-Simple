@@ -1,46 +1,206 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [display, setDisplay] = useState("");
+  const [expression, setExpression] = useState("");
 
-  const handleClick = (value) => {
-    setDisplay(display + value);
+  const operatorsDisplay = [" + ", " - ", " × ", " ÷ "];
+  const isDigit = (ch) => /\d/.test(ch);
+  const toEval = (ch) => {
+    if (ch === " × ") return "*";
+    if (ch === " ÷ ") return "/";
+    return ch.trim();
   };
+
+  const lastCharTrim = (s) => s.trim().slice(-1);
+  const endsWithOperator = (s) => operatorsDisplay.some((op) => s.endsWith(op));
+  const countOpenParens = (s) =>
+    (s.match(/\(/g) || []).length - (s.match(/\)/g) || []).length;
+
+  const handleClick = (value, showValue) => {
+    const show = showValue ?? value;
+    const evalSym = toEval(show);
+
+    if (display === "ERROR") {
+      if (operatorsDisplay.includes(show)) return;
+      setDisplay(show);
+      setExpression(evalSym);
+      return;
+    }
+
+    const curDisplay = display;
+    const curExpression = expression;
+    const lastTrim = lastCharTrim(curDisplay);
+    const lastIsOp = endsWithOperator(curDisplay);
+    const newIsOp = operatorsDisplay.includes(show);
+
+    if (curDisplay === "" && newIsOp && show !== " - ") return;
+    if (lastTrim === "(" && newIsOp && show !== " - ") return;
+
+    if (lastIsOp && newIsOp) {
+      setDisplay(curDisplay.slice(0, -3) + show);
+      setExpression(curExpression.slice(0, -1) + evalSym);
+      return;
+    }
+
+    if (lastTrim === ")" && (isDigit(show.trim()) || show === "(")) {
+      if (show === "(") {
+        setDisplay(curDisplay + " × (");
+        setExpression(curExpression + "*(");
+      } else {
+        setDisplay(curDisplay + " × " + show.trim());
+        setExpression(curExpression + "*" + evalSym);
+      }
+      return;
+    }
+
+    if ((isDigit(lastTrim) || lastTrim === ")") && show === "(") {
+      setDisplay(curDisplay + " × (");
+      setExpression(curExpression + "*(");
+      return;
+    }
+
+    setDisplay(curDisplay + show);
+    setExpression(curExpression + evalSym);
+  };
+
+  const handleOpenParen = () => {
+    if (display === "ERROR") {
+      setDisplay("(");
+      setExpression("(");
+      return;
+    }
+    const lastTrim = lastCharTrim(display);
+    if (isDigit(lastTrim) || lastTrim === ")") {
+      setDisplay(display + " × (");
+      setExpression(expression + "*(");
+    } else {
+      setDisplay(display + "(");
+      setExpression(expression + "(");
+    }
+  };
+
+  const handleCloseParen = () => {
+    if (display === "ERROR") return;
+    const openCount = countOpenParens(display);
+    const lastTrim = lastCharTrim(display);
+    if (openCount > 0 && lastTrim !== "" && !endsWithOperator(display) && lastTrim !== "(") {
+      setDisplay(display + ")");
+      setExpression(expression + ")");
+    }
+  };
+
+  const handleBackspace = () => {
+    if (display === "ERROR") {
+      setDisplay("");
+      setExpression("");
+      return;
+    }
+    if (display.endsWith(" ")) {
+      setDisplay((prev) => prev.slice(0, -3));
+      setExpression((prev) => prev.slice(0, -1));
+      return;
+    }
+    setDisplay((prev) => prev.slice(0, -1));
+    setExpression((prev) => prev.slice(0, -1));
+  };
+
+  const handleClear = () => {
+    setDisplay("");
+    setExpression("");
+  };
+
+  const calculate = () => {
+    if (display === "") return;
+    if (display === "ERROR") return;
+    if (countOpenParens(display) !== 0) {
+      setDisplay("ERROR");
+      setExpression("");
+      return;
+    }
+    try {
+      const result = eval(expression);
+      if (result === Infinity || result === -Infinity || Number.isNaN(result)) {
+        setDisplay("ERROR");
+        setExpression("");
+        return;
+      }
+      setDisplay(String(result));
+      setExpression(String(result));
+    } catch {
+      setDisplay("ERROR");
+      setExpression("");
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const key = e.key;
+      if (/\d/.test(key)) {
+        handleClick(key);
+      } else if (key === "+") {
+        handleClick(" + ");
+      } else if (key === "-") {
+        handleClick(" - ");
+      } else if (key === "*") {
+        handleClick("*", " × ");
+      } else if (key === "/") {
+        handleClick("/", " ÷ ");
+      } else if (key === "(") {
+        handleOpenParen();
+      } else if (key === ")") {
+        handleCloseParen();
+      } else if (key === "Backspace") {
+        handleBackspace();
+      } else if (key === "Enter") {
+        calculate();
+      } else if (key === "Escape") {
+        handleClear();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [display, expression]);
 
   return (
     <>
       <div className="contenedor">
+        <p className="cargando">Cargando calculadora...</p>
         <div className="calculadora">
-          <input type="text" placeholder="0" value={display} readOnly />
-          <div className="teclado">
-            <div className="numeros">
-              <button className="uno" onClick={() => handleClick("1")}>1</button>
-              <button onClick={() => handleClick("2")}>2</button>
-              <button className="tres" onClick={() => handleClick("3")}>3</button>
-              <button onClick={() => handleClick("4")}>4</button>
-              <button onClick={() => handleClick("5")}>5</button>
-              <button onClick={() => handleClick("6")}>6</button>
-              <button className="siete" onClick={() => handleClick("7")}>7</button>
-              <button onClick={() => handleClick("8")}>8</button>
-              <button className="nueve" onClick={() => handleClick("9")}>9</button>
-              <br></br>
-              <button className="cero" onClick={() => handleClick("0")}>0</button>
-            </div>
-            <div className="signos">
-              <button className="C" onClick={() => setDisplay("")}>C</button>
-              <button className="borrar" onClick={() => setDisplay(display.slice(0, -1))}>⌫</button>
-              <button onClick={() => handleClick("+")}>+</button>
-              <button onClick={() => handleClick("-")}>-</button>
-              <button onClick={() => handleClick("*")}>×</button>
-              <button className="division" onClick={() => handleClick("/")}>÷</button>
-              <button className="igual" onClick={() => setDisplay(eval(display))}>=</button>
+          <div className="contenido">
+            <input type="text" placeholder="0" value={display} readOnly />
+            <div className="teclado">
+              <div className="numeros">
+                <button className="uno" onClick={() => handleClick("1")}>1</button>
+                <button onClick={() => handleClick("2")}>2</button>
+                <button className="tres" onClick={() => handleClick("3")}>3</button>
+                <button onClick={() => handleClick("4")}>4</button>
+                <button onClick={() => handleClick("5")}>5</button>
+                <button onClick={() => handleClick("6")}>6</button>
+                <button className="siete" onClick={() => handleClick("7")}>7</button>
+                <button onClick={() => handleClick("8")}>8</button>
+                <button className="nueve" onClick={() => handleClick("9")}>9</button>
+                <br />
+                <button className="cero" onClick={() => handleClick("0")}>0</button>
+              </div>
+              <div className="signos">
+                <button className="C" onClick={handleClear}>C</button>
+                <button className="borrar" onClick={handleBackspace}>⌫</button>
+                <button onClick={() => handleClick(" + ")}>+</button>
+                <button onClick={() => handleClick(" - ")}>-</button>
+                <button onClick={() => handleClick("*", " × ")}>×</button>
+                <button onClick={() => handleClick("/", " ÷ ")}>÷</button>
+                <button onClick={handleOpenParen}>(</button>
+                <button className="parentesis" onClick={handleCloseParen}>)</button>
+                <button className="igual" onClick={calculate}>=</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <footer>
-        <p>Calculadora de Lucas</p>
+        <p>© 2025 Lucas — Desarrollador Frontend</p>
       </footer>
     </>
   );

@@ -5,6 +5,7 @@ body {
   height: 100vh;
   margin: 0;
   background-color: rgb(5, 5, 5);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .calculadora {
@@ -14,16 +15,35 @@ body {
   background-color: #353535;
   border-radius: 15px;
   box-shadow:  0 0 20px 5px rgb(255, 136, 0);
+  animation: Aparecer-agrandar 5s;
 }
 
-button, input {
-    font-size: 25px;
+.contenido {
+  animation: Aparecer 5s;
+}
+
+.cargando {
+  animation: Cargando 5s;
+  position: absolute;
+  top: 258px;
+  left: 535px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+button, input, .cargando {
+    font-size: 27px;
     color: white;
 }
 
 button {
     background-color: #242424;
     border: 1px solid rgb(255, 136, 0);
+}
+
+button:hover {
+  background-color: #0D0D0D;
 }
 
 .uno {
@@ -59,13 +79,17 @@ button {
     border-left: 1px solid #FFA42E;
 }
 
-.division {
-    border-bottom-right-radius: 10px;
+.C:hover , .borrar:hover {
+  background-color: #FF9D2E;
+}
+
+.parentesis {
+  border-bottom-right-radius: 10px;
 }
 
 .igual {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 input {
@@ -73,8 +97,10 @@ input {
   width: 98%;
   margin-bottom: 20px;
   background-color: #242424;
-  border: 2px solid rgb(255, 136, 0);
+  border: 1.5px solid rgb(255, 136, 0);
   border-radius: 10px;
+  padding-top: 5px;
+  padding-left: 10px;
 }
 
 .teclado {
@@ -97,14 +123,17 @@ input {
 footer {
     color: #C4C4C4;
     position: fixed;
-    left: 46%;
-    top: 530px    
+    left: 42%;
+    top: 535px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
 }
 
 @media (max-width: 600px) {
   .calculadora {
     height: 65vh;
     width: 40vh;
+    box-shadow:  0 0 25px 15px rgb(255, 136, 0);
   }
 
   body {
@@ -112,7 +141,7 @@ footer {
   }
 
   .teclado {
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 2.5fr 1.5fr;
     height: 45vh;
   }
 
@@ -121,11 +150,72 @@ footer {
   }
 
   .signos {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   footer {
     left: 30%;
     top: 90%
   }
+
+  button, input {
+    font-size: 35px;
+}
+
+}
+
+@keyframes Aparecer-agrandar {
+  
+  0% {
+    width: 0px;
+    height: 0px;
+  }
+
+  30% {
+    width: 340px;
+    height: 30px;
+  }
+
+  60% {
+    width: 340px;
+    height: 30px;
+  }
+
+  90% {
+    width: 500px;
+    height: 258px;
+  }
+
+}
+
+@keyframes Aparecer {
+
+  0% {
+    opacity: 0;
+  }
+
+  90% {
+    opacity: 0;
+  }
+
+}
+
+@keyframes Cargando {
+
+  0% {
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0.5;
+  }
+
+  60% {
+    opacity: 0;
+  }
+
 }
