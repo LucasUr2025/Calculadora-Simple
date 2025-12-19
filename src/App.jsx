@@ -18,10 +18,64 @@ function App() {
   const countOpenParens = (s) =>
     (s.match(/\(/g) || []).length - (s.match(/\)/g) || []).length;
 
+  const getLastToken = (s) => {
+    const trimmed = s.trim();
+    if (!trimmed) return "";
+    const parts = trimmed.split(" ");
+    return parts[parts.length - 1];
+  };
+
+  const lastTokenEndsWithDot = (s) => {
+    const token = getLastToken(s);
+    return token !== "" && token.endsWith(".");
+  };
+
+  const canAddDot = (curDisplay) => {
+    const token = getLastToken(curDisplay);
+    if (!token) return true;
+    if (token === ")" || token === "(") return false;
+    if (token.includes(".")) return false;
+    return true;
+  };
+
   const handleClick = (value, showValue) => {
     const show = showValue ?? value;
     const evalSym = toEval(show);
 
+    // Special handling for dot "."
+    if (show === ".") {
+      if (display === "ERROR") {
+        setDisplay("0.");
+        setExpression("0.");
+        return;
+      }
+
+      const curDisplay = display;
+      const curExpression = expression;
+      const lastTrim = lastCharTrim(curDisplay);
+
+      // If last char is ")" -> implicit multiplication then 0.
+      if (lastTrim === ")") {
+        setDisplay(curDisplay + " × 0.");
+        setExpression(curExpression + "*0.");
+        return;
+      }
+
+      // If last token is operator or empty -> start new number "0."
+      if (endsWithOperator(curDisplay) || curDisplay.trim() === "" || lastTrim === "(") {
+        setDisplay(curDisplay + "0.");
+        setExpression(curExpression + "0.");
+        return;
+      }
+
+      // If last token is a number, check if it already has a dot
+      if (!canAddDot(curDisplay)) return;
+      setDisplay(curDisplay + ".");
+      setExpression(curExpression + ".");
+      return;
+    }
+
+    // General handling for other buttons
     if (display === "ERROR") {
       if (operatorsDisplay.includes(show)) return;
       setDisplay(show);
@@ -35,10 +89,30 @@ function App() {
     const lastIsOp = endsWithOperator(curDisplay);
     const newIsOp = operatorsDisplay.includes(show);
 
+    // If the last token ends with a dot, only allow digits or backspace/clear/equals
+    if (lastTokenEndsWithDot(curDisplay)) {
+      // allow digits
+      if (/\d/.test(show.trim())) {
+        setDisplay(curDisplay + show.trim());
+        setExpression(curExpression + show.trim());
+      }
+      // disallow operators, "(" and ")"
+      return;
+    }
+
+    // Prevent placing "(" after a dot (extra safety)
+    if (show === "(") {
+      const lastToken = getLastToken(curDisplay);
+      if (lastTrim === "." || lastToken.endsWith(".")) {
+        return;
+      }
+    }
+
     if (curDisplay === "" && newIsOp && show !== " - ") return;
     if (lastTrim === "(" && newIsOp && show !== " - ") return;
 
     if (lastIsOp && newIsOp) {
+      // replace last operator (3 chars with spaces) with new one
       setDisplay(curDisplay.slice(0, -3) + show);
       setExpression(curExpression.slice(0, -1) + evalSym);
       return;
@@ -72,6 +146,13 @@ function App() {
       return;
     }
     const lastTrim = lastCharTrim(display);
+    const lastToken = getLastToken(display);
+
+    // Prevent opening parenthesis immediately after a dot
+    if (lastTrim === "." || lastToken.endsWith(".")) {
+      return;
+    }
+
     if (isDigit(lastTrim) || lastTrim === ")") {
       setDisplay(display + " × (");
       setExpression(expression + "*(");
@@ -97,6 +178,7 @@ function App() {
       setExpression("");
       return;
     }
+    // If the display ends with a spaced operator (e.g. " + "), remove 3 chars and 1 eval char
     if (display.endsWith(" ")) {
       setDisplay((prev) => prev.slice(0, -3));
       setExpression((prev) => prev.slice(0, -1));
@@ -137,6 +219,21 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key;
+      // If last token ends with dot, only allow digits, backspace, enter, escape
+      if (lastTokenEndsWithDot(display)) {
+        if (/\d/.test(key)) {
+          handleClick(key);
+        } else if (key === "Backspace") {
+          handleBackspace();
+        } else if (key === "Enter") {
+          calculate();
+        } else if (key === "Escape") {
+          handleClear();
+        }
+        // ignore other keys
+        return;
+      }
+
       if (/\d/.test(key)) {
         handleClick(key);
       } else if (key === "+") {
@@ -157,6 +254,8 @@ function App() {
         calculate();
       } else if (key === "Escape") {
         handleClear();
+      } else if (key === ".") {
+        handleClick(".");
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -181,8 +280,8 @@ function App() {
                 <button className="siete" onClick={() => handleClick("7")}>7</button>
                 <button onClick={() => handleClick("8")}>8</button>
                 <button className="nueve" onClick={() => handleClick("9")}>9</button>
-                <br />
                 <button className="cero" onClick={() => handleClick("0")}>0</button>
+                <button className="punto" onClick={() => handleClick(".")}>.</button>
               </div>
               <div className="signos">
                 <button className="C" onClick={handleClear}>C</button>

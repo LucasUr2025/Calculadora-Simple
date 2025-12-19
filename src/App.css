@@ -54,17 +54,12 @@ button:hover {
     border-top-right-radius: 10px;
 }
 
-.siete {
-    border-bottom-left-radius: 10px;
-}
-
-.nueve {
-    border-bottom-right-radius: 10px;
-}
-
 .cero {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.punto, .nueve {
+  border-bottom-right-radius: 10px;
 }
 
 .C {
