@@ -134,6 +134,7 @@ footer {
     height: 65vh;
     width: 40vh;
     box-shadow:  0 0 25px 15px rgb(255, 136, 0);
+    animation: Aparecer-agrandar2 5s;
   }
 
   body {
@@ -154,13 +155,19 @@ footer {
   }
 
   footer {
-    left: 30%;
+    left: 22%;
     top: 90%
   }
 
   button, input {
     font-size: 35px;
-}
+  }
+
+  .cargando {
+    left: 68px;
+    top: 292px;
+    white-space: nowrap
+  }
 
 }
 
@@ -216,6 +223,30 @@ footer {
 
   60% {
     opacity: 0;
+  }
+
+}
+
+  @keyframes Aparecer-agrandar2 {
+  
+  0% {
+    width: 0px;
+    height: 0px;
+  }
+
+  30% {
+    width: 340px;
+    height: 30px;
+  }
+
+  60% {
+    width: 340px;
+    height: 30px;
+  }
+
+  90% {
+    height: 65vh;
+    width: 40vh;
   }
 
 }
